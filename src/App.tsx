@@ -1,16 +1,15 @@
-import { useState } from 'react'
-import ButtonDefault from '@/components/common/Button/button'
+import React from 'react';
+import YeuxaPayment from '@/modules/YEUXAPayment/YEUXAPayment.tsx';
 
 
 
-function App() {
-
+const App = () => {
   return (
     <>
-      <div>Hello World</div>
-      <ButtonDefault />
-    </>
-  )
-}
+      <YeuxaPayment />
 
-export default App
+    </>
+  );
+};
+
+export default App;
