@@ -1,0 +1,94 @@
+# Simple workflow for deploying Vite app to GitHub Pages
+name: Deploy Vite App to GitHub Pages
+
+on:
+  push:
+    branches: ["dev"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "dist"
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+      # ✅ Thông báo thành công lên Discord
+      - name: Notify Discord on Success
+        if: success()
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          COMMIT_AUTHOR: ${{ github.event.head_commit.author.name }}
+          COMMIT_URL: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}
+        run: |
+          if [ -z "$DISCORD_WEBHOOK_URL" ]; then
+            echo "⚠️ Webhook URL is empty. Skipping Discord notification."
+            exit 0
+          fi
+
+          echo "Notifying Discord on success..."
+          curl -X POST "$DISCORD_WEBHOOK_URL" \
+               -H "Content-Type: application/json" \
+               -d "$(jq -n \
+                     --arg url "${{ steps.deployment.outputs.page_url }}" \
+                     --arg commit "$COMMIT_MESSAGE" \
+                     --arg author "$COMMIT_AUTHOR" \
+                     --arg commit_url "$COMMIT_URL" \
+                     '{content: "✅ Triển khai thành công! 🚀 Xem tại: \($url)\n\n**Commit:** [\($commit)](\($commit_url))\n**Tác giả:** \($author)"}')"
+      - name: Notify Discord on Failure
+        if: failure()
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          COMMIT_AUTHOR: ${{ github.event.head_commit.author.name }}
+          COMMIT_URL: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}
+          WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ -z "$DISCORD_WEBHOOK_URL" ]; then
+            echo "⚠️ Webhook URL is empty. Skipping Discord notification."
+            exit 0
+          fi
+
+          echo "Notifying Discord on failure..."
+          curl -X POST "$DISCORD_WEBHOOK_URL" \
+               -H "Content-Type: application/json" \
+               -d "$(jq -n \
+                     --arg url "$WORKFLOW_URL" \
+                     --arg commit "$COMMIT_MESSAGE" \
+                     --arg author "$COMMIT_AUTHOR" \
+                     --arg commit_url "$COMMIT_URL" \
+                     '{content: "❌ Triển khai thất bại! Xem log lỗi: \($url)\n\n**Commit:** [\($commit)](\($commit_url))\n**Tác giả:** \($author)"}')"
