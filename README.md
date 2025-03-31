@@ -131,4 +131,4 @@ Dự án được tổ chức như sau để dễ mở rộng và bảo trì:
 # Lý do: 
 # Phân tách rõ ràng: Components, pages, services tách biệt để dễ quản lý.
 # Module hóa: Styles và types riêng biệt để tái sử dụng.
-# Tính mở rộng: Dễ thêm tính năng mới (ví dụ: trang Profile).
+# Tính mở rộng: Dễ thêm tính năng mới (ví dụ: trang Profile).# YEUXA
