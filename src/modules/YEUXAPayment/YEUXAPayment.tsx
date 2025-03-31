@@ -1,114 +1,121 @@
 import React from 'react';
 import {
   Avatar,
-  Button,
-  Checkbox,
-  Divider,
-  Form,
   Input,
   Layout,
-  Progress,
+  Card,
+  Typography,
+  Steps,
+  Row,
+  Tooltip,
 } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import 'antd/dist/reset.css';
 import './styles.scss';
+import FormSection from '@/modules/YEUXAPayment/components/TransactionInfo';
+import OtpVerification from '@/modules/YEUXAPayment/components/OtpVerification';
+import QRTransaction from '@/modules/YEUXAPayment/components/QRTransaction/QRTransaction.tsx';
+import TabSwitcher from 'components/TabSwitcher';
 const { Content } = Layout;
 
+const { Title, Text } = Typography;
 const YeuxaPayment = () => {
+  const [activeTab, setActiveTab] = React.useState('account');
+
   return (
-    <Layout className="layout">
-      {/* Header */}
+    <Content className="content">
+      <div className="container">
+        <Title level={1} className={`title`}>
+          YEUXA
+        </Title>
+        <div className="left">
+          <div className="form-section">
+            {activeTab !== 'otp' && (
+              <>
+                <Title level={2} style={{ textAlign: 'left' }}>
+                  Cổng giao dịch trung gian
+                </Title>
+                <TabSwitcher activeTab={activeTab} onActive={setActiveTab} />
+              </>
+            )}
 
-      {/* Content */}
-      <Content className="content">
-        <div className="container">
-          <h1 className="title">YEUXA</h1>
-
-          {/* Giao diện giao dịch */}
-          <div className="transaction-container">
-            {/* Form nhập thông tin giao dịch */}
-            <div className="form-section">
-              <h2 className="form-title">Cổng giao dịch trung gian</h2>
-              <div className="button-group">
-                <Button type="primary" className="account-button">
-                  Số tài khoản
-                </Button>
-                <Button className="qr-button">Mã QR</Button>
-              </div>
-              <Form layout="vertical">
-                <Form.Item>
-                  <Input placeholder="Ngân hàng" />
-                </Form.Item>
-                <Form.Item>
-                  <Input placeholder="Số tài khoản" />
-                </Form.Item>
-                <Form.Item>
-                  <Input placeholder="Tên người dùng" />
-                </Form.Item>
-                <Form.Item>
-                  <Input placeholder="Số tiền" />
-                </Form.Item>
-                <Form.Item>
-                  <Input placeholder="Nội dung" />
-                </Form.Item>
-                <Form.Item wrapperCol={{ span: 13 }}>
-                  <Checkbox>Chấp nhận điều khoản và chính sách</Checkbox>
-                </Form.Item>
-                <Form.Item>
-                  <Button type="primary" block className="submit-button">
-                    Giao dịch
-                  </Button>
-                </Form.Item>
-              </Form>
-            </div>
-
-            {/* Hiển thị thông tin giao dịch */}
-            <div className="transaction-section">
-              <div className="transaction-header">
-                <Avatar src="https://placehold.co/40x40" />
-                <span>Nguyễn Tiến Hùng</span>
-              </div>
-              <h3 className="transaction-title">Giao dịch đang thực hiện</h3>
-              <Progress
-                percent={100}
-                success={{ percent: 66 }}
-                showInfo={false}
-              />
-
-              {/* Chi tiết giao dịch */}
-              <div className="transaction-info">
-                <div className="info-row">
-                  <span>Số tiền</span>
-                  <span>VND 1.000.000</span>
-                </div>
-                <div className="info-row">
-                  <span>Đến</span>
-                  <span>Nguyễn Tiến Hùng</span>
-                </div>
-                <div className="info-row">
-                  <span>
-                    Phí dịch vụ <InfoCircleOutlined />
-                  </span>
-                  <span>Miễn phí</span>
-                </div>
-              </div>
-
-              <Divider />
-
-              {/* Tổng tiền */}
-              <div className="total-row">
-                <span className="total-label">Tổng (Phí)</span>
-                <span className="total-amount">1.000.000</span>
-              </div>
-
-              {/* Input giá trị giao dịch */}
-              <Input value="10.00" className="amount-input" />
-            </div>
+            {activeTab === 'account' && <FormSection onActive={setActiveTab}/>}
+            {activeTab === 'otp' && <OtpVerification onActive={setActiveTab} />}
+            {activeTab === 'qr' && <QRTransaction />}
           </div>
         </div>
-      </Content>
-    </Layout>
+
+        <div className="right">
+          <div className="transaction-section">
+            <div className="transaction-header">
+              <Avatar src="https://placehold.co/60x60" />
+              <Title level={4} style={{ marginBottom: '0px' }}>
+                {`Nguyễn Văn A`}
+              </Title>
+            </div>
+            <Card style={{ backgroundColor: 'transparent', border: 'none' }}>
+              <Title level={4}>Giao dịch đang thực hiện</Title>
+
+              <div className="custom-steps">
+                <Steps
+                  current={2}
+                  size="small"
+                  className="ant-steps-custom"
+                  items={[
+                    {
+                      status: 'finish',
+                      icon: <div className="step-dot active" />,
+                    },
+                    {
+                      status: 'finish',
+                      icon: <div className="step-dot active" />,
+                    },
+                    { status: 'process', icon: <div className="step-dot" /> },
+                  ]}
+                />
+              </div>
+
+              <Row justify="space-between" style={{ marginTop: 16 }}>
+                <Text>Số tiền</Text>
+                <Text strong>VND 1.000.000</Text>
+              </Row>
+
+              <Row justify="space-between" style={{ marginTop: 8 }}>
+                <Text>Đến</Text>
+                <Text strong>Nguyễn Tiến Hùng</Text>
+              </Row>
+
+              <Row justify="space-between" style={{ marginTop: 8 }}>
+                <Text>
+                  Phí dịch vụ{' '}
+                  <Tooltip title="Không có phí giao dịch">
+                    <InfoCircleOutlined style={{ color: '#1890ff' }} />
+                  </Tooltip>
+                </Text>
+                <Text strong>Miễn phí</Text>
+              </Row>
+              <hr style={{ margin: '16px 0', borderTop: '1px solid #ccc' }} />
+              <Row justify="space-between">
+                <Text strong>Tổng (Phí)</Text>
+                <Text strong style={{ fontSize: 16 }}>
+                  1.000.000
+                </Text>
+              </Row>
+              <Input
+                value="1.000.000"
+                style={{
+                  marginTop: 16,
+                  textAlign: 'center',
+                  backgroundColor: '#fff',
+                  borderRadius: 8,
+                  fontWeight: 'bold',
+                }}
+              />
+            </Card>
+          </div>
+        </div>
+      </div>
+    </Content>
   );
 };
-
 export default YeuxaPayment;

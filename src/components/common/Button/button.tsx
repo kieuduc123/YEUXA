@@ -1,4 +1,4 @@
-import { getUsersAPI } from '@/services/api';
+import { getUsersAPI } from 'services/api.ts';
 import { Button } from 'antd';
 import { useEffect } from 'react';
 
