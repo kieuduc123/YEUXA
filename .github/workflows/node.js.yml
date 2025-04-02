@@ -37,11 +37,17 @@ jobs:
 
       - name: Build project
         run: npm run build
+      # Xóa artifact cũ trước khi upload
+      - name: Delete old artifacts
+        uses: geekyeggo/delete-artifact@v2
+        with:
+          name: github-pages
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: "dist"
+
 
       - name: Deploy to GitHub Pages
         id: deployment
